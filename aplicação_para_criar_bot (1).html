@@ -1,0 +1,854 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criador de Bot Inteligente para Telegram</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        secondary: '#3D3C9E',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            opacity: 0.8;
+        }
+        
+        .code-container {
+            position: relative;
+        }
+        
+        .dark pre {
+            background-color: #282828;
+        }
+        
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .dark .dark-invert {
+            filter: invert(1);
+        }
+    </style>
+</head>
+<body class="transition-colors duration-300 dark:bg-gray-900 dark:text-white">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-primary">Criador de Bot Inteligente para Telegram</h1>
+            <p class="mt-2 text-gray-600 dark:text-gray-300">Configure e gere o código para seu bot inteligente</p>
+        </header>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">1. Configuração Básica</h2>
+            
+            <div class="mb-4">
+                <label for="botToken" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Token do Bot (opcional)</label>
+                <input type="text" id="botToken" placeholder="Exemplo: 1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ" class="w-full px-4 py-2 text-base border rounded-md focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Obtido do @BotFather no Telegram</p>
+            </div>
+            
+            <div class="mb-4">
+                <label for="botName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome do Bot</label>
+                <input type="text" id="botName" placeholder="Exemplo: MeuAssistenteBot" class="w-full px-4 py-2 text-base border rounded-md focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+            
+            <div class="mb-4">
+                <label for="botDescription" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descrição do Bot</label>
+                <textarea id="botDescription" rows="2" placeholder="Exemplo: Um assistente inteligente que responde perguntas e ajuda com tarefas diárias." class="w-full px-4 py-2 text-base border rounded-md focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"></textarea>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">2. Funcionalidades</h2>
+            
+            <div class="space-y-4">
+                <div class="flex items-start">
+                    <input type="checkbox" id="welcomeMessage" class="mt-1 mr-2 h-4 w-4 text-primary focus:ring-primary" checked="">
+                    <div>
+                        <label for="welcomeMessage" class="font-medium text-gray-700 dark:text-gray-300">Mensagem de Boas-vindas</label>
+                        <input type="text" id="welcomeMessageText" placeholder="Olá! Eu sou um assistente inteligente. Como posso ajudar?" class="mt-1 w-full px-4 py-2 text-base border rounded-md focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <input type="checkbox" id="commandResponses" class="mt-1 mr-2 h-4 w-4 text-primary focus:ring-primary" checked="">
+                    <div class="w-full">
+                        <label for="commandResponses" class="font-medium text-gray-700 dark:text-gray-300">Comandos Personalizados</label>
+                        <div id="commandsContainer" class="mt-2 space-y-3">
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <input type="text" placeholder="Comando (ex: /start)" class="command-name px-4 py-2 text-base border rounded-md focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white flex-1">
+                                <input type="text" placeholder="Resposta" class="command-response px-4 py-2 text-base border rounded-md focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white flex-2">
+                            </div>
+                        </div>
+                        <button id="addCommandBtn" class="mt-2 px-4 py-1 bg-primary text-white rounded-md hover:bg-secondary transition">Adicionar Comando</button>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <input type="checkbox" id="aiIntegration" class="mt-1 mr-2 h-4 w-4 text-primary focus:ring-primary" checked="">
+                    <div>
+                        <label for="aiIntegration" class="font-medium text-gray-700 dark:text-gray-300">Integração com IA</label>
+                        <select id="aiModel" class="mt-1 w-full px-4 py-2 text-base border rounded-md focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            <option value="claude">IA Externa (Claude)</option>
+                            <option value="gpt">IA Externa (GPT)</option>
+                            <option value="basic">Respostas Baseadas em Regras</option>
+                        </select>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Para integração com IA externa, você precisará adicionar sua própria chave de API no código gerado</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <input type="checkbox" id="imageProcessing" class="mt-1 mr-2 h-4 w-4 text-primary focus:ring-primary">
+                    <div>
+                        <label for="imageProcessing" class="font-medium text-gray-700 dark:text-gray-300">Processamento de Imagens</label>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">O bot pode receber e processar imagens enviadas pelo usuário</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <input type="checkbox" id="scheduledMessages" class="mt-1 mr-2 h-4 w-4 text-primary focus:ring-primary">
+                    <div>
+                        <label for="scheduledMessages" class="font-medium text-gray-700 dark:text-gray-300">Mensagens Agendadas</label>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Permite que o bot envie mensagens em intervalos programados</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">3. Configurações Avançadas</h2>
+            
+            <div class="space-y-4">
+                <div class="flex items-start">
+                    <input type="checkbox" id="databaseStorage" class="mt-1 mr-2 h-4 w-4 text-primary focus:ring-primary">
+                    <div>
+                        <label for="databaseStorage" class="font-medium text-gray-700 dark:text-gray-300">Armazenamento em Banco de Dados</label>
+                        <select id="databaseType" class="mt-1 w-full px-4 py-2 text-base border rounded-md focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            <option value="sqlite">SQLite (local)</option>
+                            <option value="mongodb">MongoDB</option>
+                            <option value="firebase">Firebase</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <input type="checkbox" id="webhookMode" class="mt-1 mr-2 h-4 w-4 text-primary focus:ring-primary" checked="">
+                    <div>
+                        <label for="webhookMode" class="font-medium text-gray-700 dark:text-gray-300">Modo Webhook (recomendado)</label>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">O Telegram envia atualizações para seu servidor (mais eficiente)</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <input type="checkbox" id="errorLogging" class="mt-1 mr-2 h-4 w-4 text-primary focus:ring-primary" checked="">
+                    <div>
+                        <label for="errorLogging" class="font-medium text-gray-700 dark:text-gray-300">Registro de Erros</label>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Registra erros em um arquivo de log para solução de problemas</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <input type="checkbox" id="userAnalytics" class="mt-1 mr-2 h-4 w-4 text-primary focus:ring-primary">
+                    <div>
+                        <label for="userAnalytics" class="font-medium text-gray-700 dark:text-gray-300">Análise de Uso</label>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Rastreia comandos populares e padrões de uso</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-center mb-8">
+            <button id="generateBtn" class="px-8 py-3 bg-primary text-white font-bold rounded-lg hover:bg-secondary transition-colors text-lg">
+                Gerar Código do Bot
+            </button>
+        </div>
+
+        <div id="resultContainer" class="hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4">Código Gerado</h2>
+                <p class="mb-4 text-gray-600 dark:text-gray-300">Copie e salve este código em um arquivo chamado <code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">bot.py</code> para usar seu bot.</p>
+                
+                <div class="code-container">
+                    <pre id="codeOutput" class="bg-gray-100 p-4 rounded-lg overflow-x-auto dark:bg-gray-700 text-sm"></pre>
+                    <button class="copy-button px-2 py-1 bg-gray-200 dark:bg-gray-600 rounded text-sm" onclick="copyCode()">Copiar</button>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4">Instruções de Uso</h2>
+                <div id="instructionsOutput" class="prose dark:prose-invert max-w-none"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Detect dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        // Add command button functionality
+        document.getElementById('addCommandBtn').addEventListener('click', function() {
+            const commandsContainer = document.getElementById('commandsContainer');
+            const newCommandDiv = document.createElement('div');
+            newCommandDiv.className = 'flex flex-col sm:flex-row gap-2';
+            newCommandDiv.innerHTML = `
+                <input type="text" placeholder="Comando (ex: /info)" class="command-name px-4 py-2 text-base border rounded-md focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white flex-1">
+                <input type="text" placeholder="Resposta" class="command-response px-4 py-2 text-base border rounded-md focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white flex-2">
+                <button class="remove-command px-2 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition">Remover</button>
+            `;
+            commandsContainer.appendChild(newCommandDiv);
+            
+            // Add remove button functionality
+            newCommandDiv.querySelector('.remove-command').addEventListener('click', function() {
+                commandsContainer.removeChild(newCommandDiv);
+            });
+        });
+
+        // Generate button functionality
+        document.getElementById('generateBtn').addEventListener('click', function() {
+            generateBotCode();
+            document.getElementById('resultContainer').classList.remove('hidden');
+            document.getElementById('resultContainer').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Copy code functionality
+        function copyCode() {
+            const codeOutput = document.getElementById('codeOutput');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeOutput.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            const copyButton = document.querySelector('.copy-button');
+            const originalText = copyButton.textContent;
+            copyButton.textContent = 'Copiado!';
+            setTimeout(() => {
+                copyButton.textContent = originalText;
+            }, 2000);
+        }
+
+        // Generate bot code
+        function generateBotCode() {
+            const botToken = document.getElementById('botToken').value.trim() || 'YOUR_BOT_TOKEN';
+            const botName = document.getElementById('botName').value.trim() || 'MeuAssistenteBot';
+            const botDescription = document.getElementById('botDescription').value.trim() || 'Um assistente inteligente para Telegram';
+            
+            // Get all commands
+            const commandElements = document.querySelectorAll('#commandsContainer > div');
+            const commands = [];
+            
+            commandElements.forEach(element => {
+                const commandName = element.querySelector('.command-name').value.trim();
+                const commandResponse = element.querySelector('.command-response').value.trim();
+                
+                if (commandName && commandResponse) {
+                    commands.push({ command: commandName, response: commandResponse });
+                }
+            });
+            
+            // Get selected options
+            const welcomeMessage = document.getElementById('welcomeMessage').checked;
+            const welcomeMessageText = document.getElementById('welcomeMessageText').value.trim();
+            const aiIntegration = document.getElementById('aiIntegration').checked;
+            const aiModel = document.getElementById('aiModel').value;
+            const imageProcessing = document.getElementById('imageProcessing').checked;
+            const scheduledMessages = document.getElementById('scheduledMessages').checked;
+            const databaseStorage = document.getElementById('databaseStorage').checked;
+            const databaseType = document.getElementById('databaseType').value;
+            const webhookMode = document.getElementById('webhookMode').checked;
+            const errorLogging = document.getElementById('errorLogging').checked;
+            const userAnalytics = document.getElementById('userAnalytics').checked;
+            
+            // Generate Python code
+            let code = `#!/usr/bin/env python3
+# Telegram Bot: ${botName}
+# ${botDescription}
+
+import logging
+import os
+from telegram import Update, ForceReply${imageProcessing ? ', InputFile' : ''}
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+
+# Configurar logging
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=${errorLogging ? 'logging.INFO' : 'logging.ERROR'}
+)
+logger = logging.getLogger(__name__)
+
+# Token do bot Telegram
+TOKEN = "${botToken}"
+`;
+
+            // Add database imports and setup if selected
+            if (databaseStorage) {
+                if (databaseType === 'sqlite') {
+                    code += `
+# Configuração do banco de dados SQLite
+import sqlite3
+from datetime import datetime
+
+def setup_database():
+    conn = sqlite3.connect('bot_database.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            user_id INTEGER PRIMARY KEY,
+            username TEXT,
+            first_name TEXT,
+            last_name TEXT,
+            joined_date TEXT
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            message TEXT,
+            timestamp TEXT,
+            FOREIGN KEY (user_id) REFERENCES users (user_id)
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+def save_user(user_id, username, first_name, last_name):
+    conn = sqlite3.connect('bot_database.db')
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT OR IGNORE INTO users VALUES (?, ?, ?, ?, ?)",
+        (user_id, username, first_name, last_name, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    )
+    conn.commit()
+    conn.close()
+
+def save_message(user_id, message):
+    conn = sqlite3.connect('bot_database.db')
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO messages (user_id, message, timestamp) VALUES (?, ?, ?)",
+        (user_id, message, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    )
+    conn.commit()
+    conn.close()
+`;
+                } else if (databaseType === 'mongodb') {
+                    code += `
+# Configuração do banco de dados MongoDB
+import pymongo
+from datetime import datetime
+
+# Conexão com MongoDB (necessário instalar pymongo e configurar um servidor MongoDB)
+MONGO_URI = "mongodb://localhost:27017/"
+client = pymongo.MongoClient(MONGO_URI)
+db = client["telegram_bot_db"]
+users_collection = db["users"]
+messages_collection = db["messages"]
+
+def save_user(user_id, username, first_name, last_name):
+    user_data = {
+        "user_id": user_id,
+        "username": username,
+        "first_name": first_name,
+        "last_name": last_name,
+        "joined_date": datetime.now()
+    }
+    users_collection.update_one({"user_id": user_id}, {"$set": user_data}, upsert=True)
+
+def save_message(user_id, message):
+    message_data = {
+        "user_id": user_id,
+        "message": message,
+        "timestamp": datetime.now()
+    }
+    messages_collection.insert_one(message_data)
+`;
+                } else if (databaseType === 'firebase') {
+                    code += `
+# Configuração do Firebase
+import firebase_admin
+from firebase_admin import credentials, firestore
+from datetime import datetime
+
+# Inicializar Firebase (necessário instalar firebase-admin e configurar um projeto Firebase)
+cred = credentials.Certificate("path/to/serviceAccountKey.json")
+firebase_admin.initialize_app(cred)
+db = firestore.client()
+
+def save_user(user_id, username, first_name, last_name):
+    user_ref = db.collection('users').document(str(user_id))
+    user_ref.set({
+        'user_id': user_id,
+        'username': username,
+        'first_name': first_name,
+        'last_name': last_name,
+        'joined_date': firestore.SERVER_TIMESTAMP
+    })
+
+def save_message(user_id, message):
+    db.collection('messages').add({
+        'user_id': user_id,
+        'message': message,
+        'timestamp': firestore.SERVER_TIMESTAMP
+    })
+`;
+                }
+            }
+
+            // Add AI integration
+            if (aiIntegration) {
+                if (aiModel === 'claude') {
+                    code += `
+# Integração com Claude (Anthropic)
+import anthropic
+
+# Configuração da API Claude
+CLAUDE_API_KEY = "YOUR_CLAUDE_API_KEY"  # Substitua pela sua chave API
+claude_client = anthropic.Anthropic(api_key=CLAUDE_API_KEY)
+
+def get_ai_response(message):
+    try:
+        response = claude_client.messages.create(
+            model="claude-3-haiku-20240307",
+            max_tokens=1000,
+            messages=[
+                {"role": "user", "content": message}
+            ]
+        )
+        return response.content[0].text
+    except Exception as e:
+        logger.error(f"Erro ao obter resposta da IA: {e}")
+        return "Desculpe, tive um problema ao processar sua pergunta. Poderia tentar novamente?"
+`;
+                } else if (aiModel === 'gpt') {
+                    code += `
+# Integração com GPT (OpenAI)
+import openai
+
+# Configuração da API OpenAI
+OPENAI_API_KEY = "YOUR_OPENAI_API_KEY"  # Substitua pela sua chave API
+openai.api_key = OPENAI_API_KEY
+
+def get_ai_response(message):
+    try:
+        response = openai.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "Você é um assistente útil em um bot do Telegram."},
+                {"role": "user", "content": message}
+            ],
+            max_tokens=500
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        logger.error(f"Erro ao obter resposta da IA: {e}")
+        return "Desculpe, tive um problema ao processar sua pergunta. Poderia tentar novamente?"
+`;
+                } else {
+                    code += `
+# Sistema de resposta baseado em regras simples
+def get_ai_response(message):
+    message = message.lower()
+    
+    if "olá" in message or "oi" in message or "ola" in message:
+        return "Olá! Como posso ajudar?"
+    elif "como vai" in message or "tudo bem" in message:
+        return "Estou bem, obrigado por perguntar! Como posso ajudar você hoje?"
+    elif "obrigado" in message or "obrigada" in message:
+        return "De nada! Estou aqui para ajudar."
+    elif "ajuda" in message:
+        return "Posso responder perguntas simples e executar comandos. Digite /help para ver a lista de comandos disponíveis."
+    else:
+        return "Não entendi completamente. Poderia reformular sua pergunta?"
+`;
+                }
+            }
+
+            // Add image processing if selected
+            if (imageProcessing) {
+                code += `
+# Processamento de imagens
+from PIL import Image
+import io
+
+def process_image(photo_file):
+    """Processa a imagem recebida e retorna informações sobre ela"""
+    bio = io.BytesIO()
+    photo_file.download(out=bio)
+    img = Image.open(bio)
+    width, height = img.size
+    format_type = img.format
+    mode = img.mode
+    
+    return f"Imagem recebida! Formato: {format_type}, Tamanho: {width}x{height}, Modo: {mode}"
+`;
+            }
+
+            // Start function
+            code += `
+def start(update: Update, context: CallbackContext) -> None:
+    """Envia mensagem quando o comando /start é emitido."""
+    user = update.effective_user
+`;
+
+            if (databaseStorage) {
+                code += `    # Salvar informações do usuário
+    save_user(user.id, user.username, user.first_name, user.last_name)
+`;
+            }
+
+            if (welcomeMessage) {
+                code += `    update.message.reply_text(
+        f'${welcomeMessageText.replace(/'/g, "\\'")}',
+        reply_markup=ForceReply(selective=True),
+    )
+`;
+            } else {
+                code += `    update.message.reply_text(f'Olá {user.first_name}! Estou pronto para ajudar.')
+`;
+            }
+
+            // Help command
+            code += `
+def help_command(update: Update, context: CallbackContext) -> None:
+    """Envia mensagem de ajuda quando o comando /help é emitido."""
+    help_text = """
+Comandos disponíveis:
+/start - Iniciar o bot
+/help - Mostrar esta mensagem de ajuda
+`;
+            
+            // Add custom commands to help
+            commands.forEach(cmd => {
+                if (cmd.command.startsWith('/')) {
+                    code += `${cmd.command} - ${cmd.response.split('.')[0]}\n`;
+                }
+            });
+            
+            code += `"""
+    update.message.reply_text(help_text)
+`;
+
+            // Add custom command handlers
+            commands.forEach((cmd, index) => {
+                if (cmd.command.startsWith('/')) {
+                    const commandName = cmd.command.substring(1);
+                    code += `
+def ${commandName}_command(update: Update, context: CallbackContext) -> None:
+    """Responde ao comando ${cmd.command}"""
+    update.message.reply_text("${cmd.response.replace(/"/g, '\\"')}")
+`;
+                }
+            });
+
+            // Text message handler
+            code += `
+def handle_message(update: Update, context: CallbackContext) -> None:
+    """Processa mensagens de texto não reconhecidas como comandos."""
+    text = update.message.text
+`;
+
+            if (databaseStorage) {
+                code += `    # Salvar mensagem do usuário
+    save_message(update.effective_user.id, text)
+`;
+            }
+
+            if (userAnalytics) {
+                code += `    # Registrar uso para análise
+    logger.info(f"Mensagem recebida de {update.effective_user.first_name} (ID: {update.effective_user.id}): {text}")
+`;
+            }
+
+            if (aiIntegration) {
+                code += `    # Obter resposta da IA
+    response = get_ai_response(text)
+    update.message.reply_text(response)
+`;
+            } else {
+                code += `    # Resposta padrão
+    update.message.reply_text("Desculpe, não entendi esse comando. Use /help para ver os comandos disponíveis.")
+`;
+            }
+
+            // Image handling
+            if (imageProcessing) {
+                code += `
+def handle_photo(update: Update, context: CallbackContext) -> None:
+    """Processa fotos enviadas pelo usuário."""
+    photo_file = update.message.photo[-1].get_file()
+    response = process_image(photo_file)
+    update.message.reply_text(response)
+`;
+            }
+
+            // Scheduled messages
+            if (scheduledMessages) {
+                code += `
+def schedule_daily_message(context: CallbackContext) -> None:
+    """Envia uma mensagem diária para todos os usuários ativos."""
+    job = context.job
+    context.bot.send_message(job.context, text='Mensagem agendada: Lembrete diário do seu bot!')
+
+def setup_scheduled_messages(updater):
+    """Configura mensagens agendadas."""
+    job_queue = updater.job_queue
+    
+    # Exemplo: adicionar um trabalho que envia mensagem diariamente às 9:00
+    # Para enviar para vários usuários, você precisa armazenar chat_ids no banco de dados
+    # e iterar sobre eles
+    # Este exemplo usa um chat_id fixo para demonstração
+    chat_id = "YOUR_CHAT_ID"  # Substitua pelo chat_id real
+    
+    # Enviar mensagem todos os dias às 9:00
+    job_queue.run_daily(
+        schedule_daily_message,
+        time=datetime.time(hour=9, minute=0, second=0),
+        context=chat_id
+    )
+`;
+            }
+
+            // Main function
+            code += `
+def main() -> None:
+    """Inicia o bot."""`;
+
+            if (databaseStorage && databaseType === 'sqlite') {
+                code += `
+    # Configurar banco de dados
+    setup_database()`;
+            }
+
+            code += `
+    # Criar o Updater usando o token do bot
+    updater = Updater(TOKEN)
+
+    # Obter o dispatcher para registrar handlers
+    dispatcher = updater.dispatcher
+
+    # Registrar command handlers
+    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CommandHandler("help", help_command))`;
+
+            // Register custom command handlers
+            commands.forEach((cmd) => {
+                if (cmd.command.startsWith('/')) {
+                    const commandName = cmd.command.substring(1);
+                    code += `
+    dispatcher.add_handler(CommandHandler("${commandName}", ${commandName}_command))`;
+                }
+            });
+
+            // Register message and photo handlers
+            code += `
+    # Registrar message handler para mensagens de texto
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))`;
+
+            if (imageProcessing) {
+                code += `
+    # Registrar handler para fotos
+    dispatcher.add_handler(MessageHandler(Filters.photo, handle_photo))`;
+            }
+
+            if (scheduledMessages) {
+                code += `
+    # Configurar mensagens agendadas
+    setup_scheduled_messages(updater)`;
+            }
+
+            // Start the bot
+            if (webhookMode) {
+                code += `
+    # Iniciar o bot em modo webhook (para produção)
+    # Para usar webhook, você precisará de um servidor com HTTPS
+    # Comente o updater.start_polling() e descomente o código abaixo quando estiver pronto
+    
+    # PORT = int(os.environ.get('PORT', '8443'))
+    # updater.start_webhook(
+    #     listen='0.0.0.0',
+    #     port=PORT,
+    #     url_path=TOKEN,
+    #     webhook_url='https://your-app-name.herokuapp.com/' + TOKEN
+    # )
+    
+    # Por enquanto, usar polling para desenvolvimento
+    updater.start_polling()`;
+            } else {
+                code += `
+    # Iniciar o bot em modo polling (para desenvolvimento)
+    updater.start_polling()`;
+            }
+
+            code += `
+    updater.idle()
+
+
+if __name__ == '__main__':
+    main()
+`;
+
+            // Display code
+            document.getElementById('codeOutput').textContent = code;
+            
+            // Generate instructions
+            const instructions = `
+### Instruções de Uso
+
+#### Requisitos
+Primeiro, você precisará instalar o Python e as bibliotecas necessárias:
+
+1. Instale o Python 3.7 ou superior de [python.org](https://python.org)
+
+2. Instale a biblioteca python-telegram-bot:
+   \`\`\`
+   pip install python-telegram-bot==13.7
+   \`\`\`
+
+${aiIntegration ? `3. Instale a biblioteca para integração com IA:
+   \`\`\`
+   ${aiModel === 'claude' ? 'pip install anthropic' : aiModel === 'gpt' ? 'pip install openai' : ''}
+   \`\`\`
+` : ''}
+
+${databaseStorage ? `4. Instale a biblioteca para banco de dados:
+   \`\`\`
+   ${databaseType === 'sqlite' ? '' : databaseType === 'mongodb' ? 'pip install pymongo' : 'pip install firebase-admin'}
+   \`\`\`
+` : ''}
+
+#### Passos para executar o bot:
+
+1. Crie um bot no Telegram:
+   - Abra o Telegram e procure por "@BotFather"
+   - Envie o comando \`/newbot\`
+   - Siga as instruções para criar um novo bot
+   - Anote o token de API fornecido pelo BotFather
+
+2. Configure o token:
+   - Abra o arquivo de código gerado
+   - Substitua "YOUR_BOT_TOKEN" pelo token que você recebeu do BotFather
+
+${aiIntegration ? `3. Configure a chave de API da IA:
+   - Substitua "YOUR_${aiModel.toUpperCase()}_API_KEY" pela sua chave de API
+   - ${aiModel === 'claude' ? 'Obtenha uma chave de API da Anthropic em https://console.anthropic.com' : aiModel === 'gpt' ? 'Obtenha uma chave de API da OpenAI em https://platform.openai.com' : ''}
+` : ''}
+
+${databaseStorage && databaseType === 'firebase' ? `4. Configure o Firebase:
+   - Crie um projeto no Firebase Console
+   - Gere uma chave de conta de serviço
+   - Atualize o caminho para seu arquivo de credenciais no código
+` : ''}
+
+${scheduledMessages ? `5. Configure mensagens agendadas:
+   - Substitua "YOUR_CHAT_ID" pelo ID do chat onde deseja enviar mensagens
+   - Para obter o chat_id, adicione o bot @userinfobot no Telegram e envie qualquer mensagem a ele
+` : ''}
+
+6. Execute o bot:
+   \`\`\`
+   python bot.py
+   \`\`\`
+
+7. No Telegram, inicie uma conversa com seu bot procurando pelo nome de usuário que você configurou.
+
+#### Comandos do Bot
+Os seguintes comandos estão disponíveis no seu bot:
+
+- \`/start\` - Inicia o bot e envia a mensagem de boas-vindas
+- \`/help\` - Mostra a lista de comandos disponíveis
+${commands.filter(cmd => cmd.command.startsWith('/')).map(cmd => `- \`${cmd.command}\` - ${cmd.response.split('.')[0]}`).join('\n')}
+
+#### Personalização Avançada
+
+Para personalizar ainda mais seu bot, você pode:
+
+1. Adicionar mais comandos editando o código
+2. Modificar as respostas da IA ajustando a função \`get_ai_response\`
+3. Implementar recursos adicionais como teclados inline, botões e menus
+
+#### Implantação em Produção
+
+Para implantar seu bot em um servidor:
+
+1. Configure um servidor web (Heroku, AWS, DigitalOcean, etc.)
+2. Descomente e configure o código de webhook
+3. Certifique-se de que seu servidor tenha HTTPS configurado
+4. Configure as variáveis de ambiente necessárias no servidor
+
+#### Recursos Adicionais
+
+- [Documentação do python-telegram-bot](https://python-telegram-bot.readthedocs.io/)
+- [API do Telegram para Bots](https://core.telegram.org/bots/api)
+- [Tutorial de Webhooks](https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks)
+`;
+
+            document.getElementById('instructionsOutput').innerHTML = marked.parse(instructions);
+        }
+
+        // Initialize with default values
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add default commands
+            const commandsContainer = document.getElementById('commandsContainer');
+            const defaultCommands = [
+                { command: '/start', response: 'Inicia o bot e envia uma mensagem de boas-vindas.' },
+                { command: '/help', response: 'Mostra a lista de comandos disponíveis.' },
+                { command: '/info', response: 'Exibe informações sobre este bot e suas funcionalidades.' }
+            ];
+            
+            defaultCommands.forEach((cmd, index) => {
+                if (index > 0) { // Skip the first one as it's already in the HTML
+                    const newCommandDiv = document.createElement('div');
+                    newCommandDiv.className = 'flex flex-col sm:flex-row gap-2';
+                    newCommandDiv.innerHTML = `
+                        <input type="text" placeholder="Comando (ex: /info)" value="${cmd.command}" class="command-name px-4 py-2 text-base border rounded-md focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white flex-1">
+                        <input type="text" placeholder="Resposta" value="${cmd.response}" class="command-response px-4 py-2 text-base border rounded-md focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white flex-2">
+                        <button class="remove-command px-2 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition">Remover</button>
+                    `;
+                    commandsContainer.appendChild(newCommandDiv);
+                    
+                    // Add remove button functionality
+                    newCommandDiv.querySelector('.remove-command').addEventListener('click', function() {
+                        commandsContainer.removeChild(newCommandDiv);
+                    });
+                } else {
+                    // Set values for the first command that's already in the HTML
+                    const firstCommand = commandsContainer.querySelector('.command-name');
+                    const firstResponse = commandsContainer.querySelector('.command-response');
+                    if (firstCommand && firstResponse) {
+                        firstCommand.value = cmd.command;
+                        firstResponse.value = cmd.response;
+                    }
+                }
+            });
+            
+            // Set default welcome message
+            document.getElementById('welcomeMessageText').value = 'Olá! Sou um bot inteligente para Telegram. Como posso ajudar você hoje?';
+        });
+    </script>
+
+
+</body></html>
